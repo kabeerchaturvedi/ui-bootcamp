@@ -1,6 +1,7 @@
 const tableData = document.getElementById("table-data");
 const editButton = document.getElementById("sort-btn");
 const deleteButton = document.getElementById("delete-btn");
+const searchBar = document.getElementById("searchBar");
 
 let dataset;
 
@@ -17,9 +18,9 @@ function loadData() {
     });
 }
 
-function renderData() {
+function renderData(data) {
   let output = "";
-  dataset.forEach((person) => {
+  (data || dataset).forEach((person) => {
     output += `
 <tbody>
 <tr>
@@ -28,12 +29,22 @@ function renderData() {
 <td>${person.address.city}</td>
 <td>${person.website}</td>
 <td>${person.company.name}</td>
-<td><button onclick="deleteData(this)" data-id="${person.id}">DELETE</button></td>
+<td><button onclick="deleteData(this)" class="btn-delete" data-id="${person.id}">DELETE</button></td>
 </tr>
 </tbody>`;
   });
   tableData.innerHTML = output;
 }
+
+searchBar.addEventListener("keyup", (e) => {
+  const searchString = e.target.value.toLowerCase();
+
+  const filteredCharacters = dataset.filter((item) => {
+    return item.name.toLowerCase().includes(searchString);
+  });
+  console.log(filteredCharacters);
+  renderData(filteredCharacters);
+});
 
 editButton.addEventListener("click", sortedData);
 
@@ -51,10 +62,6 @@ function deleteData(obj) {
     .then((response) => response.json())
     .then((data) => {
       dataset = dataset.filter((person) => Number(id) !== person.id);
-      console.log(dataset);
       renderData();
     });
 }
-// deleteButton.addEventListener("click", (e) => {
-//   console.log(e.target.value);
-// });
